@@ -1,4 +1,8 @@
-/* eslint no-console: 0 */
+/**
+ * Verkefni 9 – Listaverkaleit
+ * Vefforritun 1 (2025)
+ * Leita í AIC API, sýna niðurstöður og stakt verk. Slow/Error togglar eru í forminu.
+ */
 
 import { el, empty } from "./lib/elements.js";
 import { sleep, error as throwError } from "./lib/helpers.js";
@@ -6,20 +10,33 @@ import { sleep, error as throwError } from "./lib/helpers.js";
 const API = "https://api.artic.edu/api/v1";
 const root = document.querySelector(".art-searcher");
 
-// IIIF slóð
+/**
+ * IIIF slóð fyrir mynd. Skilar null ef ekkert image_id.
+ * @param {string|null|undefined} imageId
+ * @param {number} [w=600]
+ * @returns {string|null}
+ */
 function iiif(imageId, w = 600) {
   if (!imageId) return null;
   return `https://www.artic.edu/iiif/2/${imageId}/full/${w},/0/default.jpg`;
 }
 
-// fetch -> json, kastar á non-2xx
+/**
+ * Sækir JSON og kastar ef svar er ekki 2xx.
+ * @template T
+ * @param {string} url
+ * @returns {Promise<T>}
+ */
 async function getJSON(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
 
-// leit
+/**
+ * renderar  leit: form + niðurstöður.
+ * @param {string} [initialQ=""]
+ */
 function renderSearch(initialQ = "") {
   empty(root);
 
@@ -111,7 +128,11 @@ function renderSearch(initialQ = "") {
   root.append(form, results);
 }
 
-// stakt verk
+/**
+ * renderar stakt verk úr artworks/{id}.
+ * @param {string} id
+ * @param {string} [q=""]
+ */
 async function renderArtwork(id, q = "") {
   empty(root);
   root.append(el("p", {}, "Sæki verk..."));
@@ -165,7 +186,9 @@ async function renderArtwork(id, q = "") {
   }
 }
 
-// ræsa: ef id er í URL sýnum verk, annars leit
+/**
+ * startar appi: ef id er í URL er  verk synt, annars leitað.
+ */
 function boot() {
   const params = new URLSearchParams(window.location.search);
   const id = params.get("id");
